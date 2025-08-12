@@ -1,0 +1,10 @@
+PyQt6>=6.4.0
+pynput>=1.7.6
+PyYAML>=6.0
+
+# MIDI backend (choose one)
+# Option 1: Mido (easier to install, pure Python)
+mido>=1.3.0
+
+# Option 2: RTMidi (better performance, requires compiler)
+# python-rtmidi>=1.5.0
