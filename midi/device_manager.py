@@ -52,13 +52,9 @@ class MidiDeviceManager(QObject):
         self.current_device = None
         
         # Try to initialize MIDI backend
-        try:
-            self.midi_backend = get_midi_backend()
-            if not self.midi_backend:
-                print("Warning: No MIDI backend available!")
-        except Exception as e:
-            print(f"Error initializing MIDI backend: {e}")
-            self.midi_backend = None
+        self.midi_backend = get_midi_backend()
+        if not self.midi_backend:
+            print("Warning: No MIDI backend available!")
         
     def get_available_devices(self) -> List[Tuple[int, str]]:
         if not self.midi_backend:

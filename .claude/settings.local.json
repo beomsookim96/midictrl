@@ -3,7 +3,25 @@
     "allow": [
       "Bash(pip install:*)",
       "Bash(python -m pip install:*)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(python -m pip:*)",
+      "Bash(python:*)",
+      "Bash(sudo apt:*)",
+      "Bash(sudo apt install:*)",
+      "Bash(apt list:*)",
+      "Bash(rm:*)",
+      "Bash(tree:*)",
+      "Bash(npm start)",
+      "Bash(curl:*)",
+      "Bash(pkill:*)",
+      "Bash(npm run dev:*)",
+      "Bash(npm run test-midi:*)",
+      "Bash(npm rebuild:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run test-robotjs:*)",
+      "Bash(npm ls:*)",
+      "Bash(npx:*)",
+      "Bash(npm search:*)"
     ],
     "deny": []
   }

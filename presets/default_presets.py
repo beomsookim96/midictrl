@@ -215,6 +215,78 @@ def create_default_presets():
                 "59": {"mapping_type": "single_key", "trigger_mode": "press", "key": "F12", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64}
             },
             "control_mappings": {}
+        },
+        
+        "chromatic_numbers": {
+            "preset_name": "Chromatic Numbers",
+            "description": "Map all 25 keys chromatically to numbers and symbols",
+            "mappings": {
+                # First octave: C1-B1 (notes 48-59)
+                "48": {"mapping_type": "single_key", "trigger_mode": "press", "key": "1", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},
+                "49": {"mapping_type": "single_key", "trigger_mode": "press", "key": "!", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},  # C#1
+                "50": {"mapping_type": "single_key", "trigger_mode": "press", "key": "2", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},
+                "51": {"mapping_type": "single_key", "trigger_mode": "press", "key": "@", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},  # D#1
+                "52": {"mapping_type": "single_key", "trigger_mode": "press", "key": "3", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},
+                "53": {"mapping_type": "single_key", "trigger_mode": "press", "key": "4", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},
+                "54": {"mapping_type": "single_key", "trigger_mode": "press", "key": "$", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},  # F#1
+                "55": {"mapping_type": "single_key", "trigger_mode": "press", "key": "5", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},
+                "56": {"mapping_type": "single_key", "trigger_mode": "press", "key": "%", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},  # G#1
+                "57": {"mapping_type": "single_key", "trigger_mode": "press", "key": "6", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},
+                "58": {"mapping_type": "single_key", "trigger_mode": "press", "key": "^", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},  # A#1
+                "59": {"mapping_type": "single_key", "trigger_mode": "press", "key": "7", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},
+                
+                # Second octave: C2-B2 (notes 60-71)
+                "60": {"mapping_type": "single_key", "trigger_mode": "press", "key": "8", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},
+                "61": {"mapping_type": "single_key", "trigger_mode": "press", "key": "*", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},  # C#2
+                "62": {"mapping_type": "single_key", "trigger_mode": "press", "key": "9", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},
+                "63": {"mapping_type": "single_key", "trigger_mode": "press", "key": "(", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},  # D#2
+                "64": {"mapping_type": "single_key", "trigger_mode": "press", "key": "0", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},
+                "65": {"mapping_type": "single_key", "trigger_mode": "press", "key": "-", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},
+                "66": {"mapping_type": "single_key", "trigger_mode": "press", "key": "_", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},  # F#2
+                "67": {"mapping_type": "single_key", "trigger_mode": "press", "key": "=", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},
+                "68": {"mapping_type": "single_key", "trigger_mode": "press", "key": "+", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},  # G#2
+                "69": {"mapping_type": "single_key", "trigger_mode": "press", "key": "[", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},
+                "70": {"mapping_type": "single_key", "trigger_mode": "press", "key": "{", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},  # A#2
+                "71": {"mapping_type": "single_key", "trigger_mode": "press", "key": "]", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},
+                
+                # Third octave: C3 (note 72)
+                "72": {"mapping_type": "single_key", "trigger_mode": "press", "key": "}", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64}
+            },
+            "control_mappings": {}
+        },
+        
+        "chromatic_letters": {
+            "preset_name": "Chromatic Letters", 
+            "description": "Map all 25 keys chromatically to alphabet letters",
+            "mappings": {
+                # Map to A-Z (25 keys covers A-Y)
+                "48": {"mapping_type": "single_key", "trigger_mode": "press", "key": "a", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},
+                "49": {"mapping_type": "single_key", "trigger_mode": "press", "key": "b", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},
+                "50": {"mapping_type": "single_key", "trigger_mode": "press", "key": "c", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},
+                "51": {"mapping_type": "single_key", "trigger_mode": "press", "key": "d", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},
+                "52": {"mapping_type": "single_key", "trigger_mode": "press", "key": "e", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},
+                "53": {"mapping_type": "single_key", "trigger_mode": "press", "key": "f", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},
+                "54": {"mapping_type": "single_key", "trigger_mode": "press", "key": "g", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},
+                "55": {"mapping_type": "single_key", "trigger_mode": "press", "key": "h", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},
+                "56": {"mapping_type": "single_key", "trigger_mode": "press", "key": "i", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},
+                "57": {"mapping_type": "single_key", "trigger_mode": "press", "key": "j", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},
+                "58": {"mapping_type": "single_key", "trigger_mode": "press", "key": "k", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},
+                "59": {"mapping_type": "single_key", "trigger_mode": "press", "key": "l", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},
+                "60": {"mapping_type": "single_key", "trigger_mode": "press", "key": "m", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},
+                "61": {"mapping_type": "single_key", "trigger_mode": "press", "key": "n", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},
+                "62": {"mapping_type": "single_key", "trigger_mode": "press", "key": "o", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},
+                "63": {"mapping_type": "single_key", "trigger_mode": "press", "key": "p", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},
+                "64": {"mapping_type": "single_key", "trigger_mode": "press", "key": "q", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},
+                "65": {"mapping_type": "single_key", "trigger_mode": "press", "key": "r", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},
+                "66": {"mapping_type": "single_key", "trigger_mode": "press", "key": "s", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},
+                "67": {"mapping_type": "single_key", "trigger_mode": "press", "key": "t", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},
+                "68": {"mapping_type": "single_key", "trigger_mode": "press", "key": "u", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},
+                "69": {"mapping_type": "single_key", "trigger_mode": "press", "key": "v", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},
+                "70": {"mapping_type": "single_key", "trigger_mode": "press", "key": "w", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},
+                "71": {"mapping_type": "single_key", "trigger_mode": "press", "key": "x", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64},
+                "72": {"mapping_type": "single_key", "trigger_mode": "press", "key": "y", "modifiers": [], "velocity_sensitive": False, "velocity_threshold": 64}
+            },
+            "control_mappings": {}
         }
     }
     

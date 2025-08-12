@@ -1,7 +1,7 @@
 import time
 import subprocess
 from typing import Dict, Set
-from pynput.keyboard import Key, Controller as KeyboardController, Listener
+from pynput.keyboard import Key, Controller as PynputController, Listener
 from pynput import mouse
 from PyQt6.QtCore import QObject, QTimer
 from core.key_mapper import KeyMapperConfig, KeyMapping, MappingType, TriggerMode
@@ -10,7 +10,7 @@ class KeyboardController(QObject):
     def __init__(self, config: KeyMapperConfig):
         super().__init__()
         self.config = config
-        self.keyboard = KeyboardController()
+        self.keyboard = PynputController()
         self.mouse = mouse.Controller()
         self.running = False
         
