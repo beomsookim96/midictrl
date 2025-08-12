@@ -1,0 +1,106 @@
+/* Control Section Styles - Grid layout for 3x2 */
+.control-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+    border: 2px solid #444;
+    border-radius: 12px;
+    padding: 1rem;
+    min-width: 140px;
+}
+
+.control-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    gap: 0.4rem;
+    width: 120px;
+}
+
+.control-btn {
+    padding: 0.6rem 0.4rem;
+    background: linear-gradient(145deg, #87CEEB, #4682B4);
+    border: 1px solid #4682B4;
+    border-radius: 6px;
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+    box-shadow: 
+        0 1px 3px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    user-select: none;
+    min-height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.control-btn:hover {
+    background: linear-gradient(145deg, #B0E0E6, #5F9EA0);
+    border-color: #5F9EA0;
+    transform: translateY(-1px);
+    box-shadow: 
+        0 2px 6px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.control-btn:active {
+    background: linear-gradient(145deg, #4682B4, #2F4F4F);
+    transform: translateY(1px);
+    box-shadow: 
+        0 1px 2px rgba(0, 0, 0, 0.4),
+        inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.control-btn.pressed {
+    background: linear-gradient(145deg, #4169E1, #1E90FF);
+    border-color: #4169E1;
+    color: #ffffff;
+    transform: translateY(1px);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* All control buttons use unified sky blue theme */
+
+/* Control button animations */
+@keyframes controlPress {
+    0% { transform: scale(1) translateY(0); }
+    50% { transform: scale(0.95) translateY(2px); }
+    100% { transform: scale(1) translateY(0); }
+}
+
+.control-btn.animate-press {
+    animation: controlPress 0.15s ease-in-out;
+}
+
+/* Responsive design for control buttons */
+@media (max-width: 768px) {
+    .control-buttons {
+        gap: 0.5rem;
+    }
+    
+    .control-btn {
+        padding: 0.6rem 1rem;
+        font-size: 0.8rem;
+        min-width: 70px;
+    }
+}
+
+@media (max-width: 480px) {
+    .control-buttons {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .control-btn {
+        width: 100%;
+        max-width: 200px;
+        padding: 0.8rem;
+        font-size: 0.9rem;
+    }
+}

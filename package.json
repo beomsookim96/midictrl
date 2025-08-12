@@ -1,0 +1,68 @@
+{
+  "name": "midictrl-electron",
+  "version": "1.0.0",
+  "description": "KORG nanoKEY2 MIDI Key Mapper - Electron Edition",
+  "main": "src/main.js",
+  "homepage": "./",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder --publish=never",
+    "postinstall": "electron-builder install-app-deps",
+    "setup": "node install-simple.js && npm start",
+    "test-midi": "node test-midi.js",
+    "test-robotjs": "node test_robotjs.js"
+  },
+  "keywords": [
+    "midi",
+    "nanokey2",
+    "korg",
+    "key-mapper",
+    "electron",
+    "music"
+  ],
+  "author": "MidiCtrl Team",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.0.0",
+    "electron-rebuild": "^3.2.9"
+  },
+  "dependencies": {
+    "@nut-tree-fork/nut-js": "^4.2.6",
+    "easymidi": "^3.1.0",
+    "robotjs": "^0.6.0"
+  },
+  "build": {
+    "appId": "com.midictrl.electron",
+    "productName": "MidiCtrl",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "backend/**/*",
+      "node_modules/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "backend",
+        "to": "backend"
+      }
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "assets/icon.icns"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "assets/icon.png"
+    }
+  }
+}
