@@ -21,7 +21,8 @@
       "Bash(npm run test-robotjs:*)",
       "Bash(npm ls:*)",
       "Bash(npx:*)",
-      "Bash(npm search:*)"
+      "Bash(npm search:*)",
+      "WebFetch(domain:codepen.io)"
     ],
     "deny": []
   }
