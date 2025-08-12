@@ -22,7 +22,10 @@
       "Bash(npm ls:*)",
       "Bash(npx:*)",
       "Bash(npm search:*)",
-      "WebFetch(domain:codepen.io)"
+      "WebFetch(domain:codepen.io)",
+      "Bash(find:*)",
+      "Bash(true)",
+      "Bash(mv:*)"
     ],
     "deny": []
   }

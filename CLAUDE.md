@@ -6,80 +6,123 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Installation & Setup
 ```bash
-# Install dependencies
-python install.py                    # Cross-platform installer
-# or
-pip install PyQt6 pynput PyYAML mido
+# Install Node.js dependencies
+npm install
 
-# Test installation
-python test_install.py
+# One-command setup (installs everything and starts app)
+npm run setup
 
-# Windows-specific
-install.bat                          # Windows batch installer
+# Test MIDI functionality
+npm run test-midi
+
+# Test keyboard control (robotjs)
+npm run test-robotjs
+
+# Windows-specific helpers
+node install-windows.js             # Install Windows dependencies
+install_windows.bat                  # Batch script installer
+fix_robotjs.bat                      # Fix robotjs compilation issues
 ```
 
 ### Running the Application
 ```bash
-python main.py                       # Main entry point
-# or
-python run.py                        # Launcher script
+npm start                           # Production mode
+npm run dev                         # Development mode (with DevTools)
 
-# Windows
-run.bat                              # Windows batch launcher
+# Alternative Electron commands
+electron .                          # Direct Electron execution
+electron . --dev                    # Dev mode
+```
+
+### Building & Distribution
+```bash
+npm run build                       # Build for all platforms
+npm run pack                        # Package without distribution
+npm run dist                        # Create distributable packages
+
+# Platform-specific builds
+npm run dist -- --win              # Windows only
+npm run dist -- --mac              # macOS only
+npm run dist -- --linux            # Linux only
 ```
 
 ### Development & Testing
 ```bash
-# Test MIDI device detection and module imports
-python test_install.py
+# Backend testing
+node test-backend.js                # Test Node.js backend
+node restart-backend.js             # Restart backend components
+node kill-backend.js                # Kill background processes
 
-# Manual module testing (from test_install.py)
-python -c "from midi.midi_backend import get_midi_backend; print('Backend OK')"
+# MIDI testing
+node test-midi.js                   # Test MIDI device detection
+node test_robotjs.js                # Test keyboard control
 ```
 
 ## Architecture Overview
 
 ### Core Components
 
-**MidiCtrl** is a PyQt6-based MIDI key mapper for KORG nanoKEY2 controllers. The architecture follows a modular design:
+**MidiCtrl** is an Electron-based MIDI key mapper for KORG nanoKEY2 controllers with a hybrid architecture:
 
-1. **MIDI Layer** (`midi/`):
-   - `device_manager.py`: Handles MIDI device connection/detection with threading
-   - `midi_backend.py`: Abstraction layer supporting both RTMidi and Mido backends
-   - Auto-detects nanoKEY2 devices by name pattern matching
+1. **Frontend Layer** (`src/`):
+   - `main.js`: Main Electron process with IPC handlers
+   - `preload.js`: Secure IPC bridge between main and renderer
+   - `index.html`: Web-based UI
+   - `js/`: Frontend JavaScript modules (app.js, piano.js, mapping.js)
 
-2. **Core Logic** (`core/`):
-   - `key_mapper.py`: Mapping configuration with support for multiple mapping types (single key, combos, text, commands, macros) and trigger modes (press/release/toggle/hold)
-   - `keyboard_controller.py`: Executes mapped actions using pynput for cross-platform keyboard simulation
+2. **Backend Layer** (Node.js modules in `src/`):
+   - `core/keyMapper.js`: Configuration management with profile system
+   - `core/keyboardController.js`: Cross-platform keyboard automation (robotjs/nut.js)
+   - `core/notificationSystem.js`: Desktop notifications for profile switching
+   - `midi/midiHandler.js`: MIDI device handling with easymidi
 
-3. **UI Layer** (`ui/`):
-   - `main_window.py`: Main application window with device selection and mapping management
-   - `nanokey_widget.py`: Visual representation of nanoKEY2 with clickable keys
-   - `mapping_dialog.py`: Configuration dialog for key mappings
-   - `qt_compat.py`: PyQt6 compatibility helpers
-
-4. **Presets** (`presets/`):
-   - `default_presets.py`: Installs default preset files for DAW, gaming, text editing, and function keys
 
 ### Key Architecture Patterns
 
-- **Threading**: MIDI input runs in separate `QThread` to prevent UI blocking
-- **Signal/Slot**: PyQt signals connect MIDI events to mapping execution
-- **Configuration**: JSON-based config with automatic save/load to `~/.midictrl/`
-- **Backend Abstraction**: Supports both RTMidi (performance) and Mido (compatibility) through unified interface
-- **Preset System**: JSON-based preset files that can be saved/loaded for different use cases
+- **Electron Main/Renderer**: Secure IPC communication between processes
+- **Event-Driven**: EventEmitter-based architecture for MIDI and keyboard events
+- **Profile System**: Dual-profile support with MOD button switching (Profile 1 ↔ Profile 2)
+- **Cross-Platform Keyboard Control**: robotjs (primary) with nut.js fallback
+- **Virtual Mode**: Graceful degradation when native libraries fail
+- **Desktop Notifications**: Native OS notifications for profile changes
 
-### MIDI Note Mapping
-- nanoKEY2 provides 25 keys (C1-C3, MIDI notes 48-72)
-- Control buttons: Octave +/-, Pitch +/-, Mod, Sustain
-- Each key/control can map to different action types with various trigger modes
+### MIDI Event Flow
+1. `easymidi` detects MIDI events from nanoKEY2
+2. `MidiHandler` processes and emits structured events
+3. MOD button (control 1) triggers profile switching
+4. `KeyMapper` resolves note → mapping based on current profile
+5. `KeyboardController` executes the mapped action
+6. Desktop notification shows profile changes
+
+### Mapping Types & Features
+- **Enhanced Mapping Types**:
+  - `single_key` / `key_combo`: Standard key presses with modifiers
+  - `text_input`: Fast text input via clipboard (Ctrl+V) with fallback
+  - `command`: System command execution
+  - `application`: Cross-platform application launching
+  - `website`: URL opening via Electron shell
+  - `macro`: Multi-step automation (planned)
+
+- **Profile Management**:
+  - Two profiles: "Profile 1" and "Profile 2"
+  - MOD button switches profiles with desktop notification
+  - Independent mapping configurations per profile
+  - Automatic save/restore of profile state
 
 ### Configuration Storage
-- User config: `~/.midictrl/config.json`
-- Presets: `~/.midictrl/presets/`
-- Settings persist between sessions automatically
+- Main config: `~/.midictrl/config.json`
+- Profile data embedded in config with current profile tracking
+- Preset system: `~/.midictrl/presets/`
+- Settings persist automatically with profile-aware storage
 
-### Error Handling
-- Graceful fallback from RTMidi to Mido if compilation fails
-- MIDI device connection resilience with auto-reconnect attempts
-- UI remains responsive even when MIDI backend is unavailable
+### Error Handling & Fallbacks
+- **MIDI Libraries**: easymidi → virtual mode (with fake device simulation)
+- **Keyboard Control**: robotjs → nut.js → virtual logging mode
+- **Text Input**: clipboard method → character-by-character fallback
+- **Profile System**: Graceful handling of missing profile data
+
+### Cross-Platform Considerations
+- **Windows**: Uses `start` command for applications, handles robotjs compilation
+- **macOS**: Uses `open` command, supports .app bundles
+- **Linux**: Uses `xdg-open`, requires audio group membership for MIDI
+- **WSL2**: Special handling for Windows subsystem limitations
