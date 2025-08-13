@@ -57,6 +57,11 @@ class MidiCtrlApp {
         window.electronAPI.onMidiEvent((event) => {
             this.handleMidiEvent(event);
         });
+
+        // Profile switching events
+        window.electronAPI.onProfileSwitched((profileName) => {
+            this.handleProfileSwitch(profileName);
+        });
     }
 
     async loadInitialData() {
@@ -185,6 +190,31 @@ class MidiCtrlApp {
         } else if (event.type === 'cc') {
             console.log(`MIDI CC: ${event.controller} = ${event.value}`);
         }
+    }
+
+    handleProfileSwitch(profileName) {
+        console.log(`Profile switched to: ${profileName}`);
+        
+        // Update profile status indicator
+        const profileStatus = document.getElementById('profile-status');
+        if (profileStatus) {
+            const profileText = profileStatus.querySelector('.status-text');
+            profileText.textContent = profileName;
+            
+            // Add visual feedback
+            profileStatus.classList.add('profile-switched');
+            setTimeout(() => {
+                profileStatus.classList.remove('profile-switched');
+            }, 1000);
+        }
+        
+        // Reload mappings for the new profile
+        if (window.mappingManager) {
+            window.mappingManager.loadMappings();
+        }
+        
+        // Show success message
+        this.showSuccess(`Switched to ${profileName}`);
     }
 
     updateConnectionStatus() {

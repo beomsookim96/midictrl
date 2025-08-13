@@ -17,6 +17,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
     savePreset: (presetName) => ipcRenderer.invoke('save-preset', presetName),
     getPresets: () => ipcRenderer.invoke('get-presets'),
     clearAllMappings: () => ipcRenderer.invoke('clear-all-mappings'),
+    
+    // Profile operations
+    switchProfile: () => ipcRenderer.invoke('switch-profile'),
+    getCurrentProfile: () => ipcRenderer.invoke('get-current-profile'),
+    
     getAppInfo: () => ipcRenderer.invoke('get-app-info'),
     
     // File operations
@@ -29,6 +34,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     onMidiEvent: (callback) => ipcRenderer.on('midi-event', (event, data) => callback(data)),
     onDeviceConnected: (callback) => ipcRenderer.on('device-connected', (event, data) => callback(data)),
     onDeviceDisconnected: (callback) => ipcRenderer.on('device-disconnected', (event, data) => callback(data)),
+    onProfileSwitched: (callback) => ipcRenderer.on('profile-switched', (event, data) => callback(data)),
     
     // Remove listeners
     removeAllListeners: (channel) => ipcRenderer.removeAllListeners(channel)

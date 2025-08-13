@@ -67,10 +67,11 @@ class MidiHandler extends EventEmitter {
             
         } else {
             // Virtual mode - return fake devices
-            return [
+            this.devices = [
                 { id: 0, name: 'Virtual nanoKEY2 (Test)', type: 'input' },
                 { id: 1, name: 'Virtual MIDI Device', type: 'input' }
             ];
+            return this.devices;
         }
     }
 
@@ -155,6 +156,7 @@ class MidiHandler extends EventEmitter {
             
         } else {
             // Virtual mode
+            console.log('📱 Starting virtual device mode...');
             this.startVirtualDevice(device);
         }
 
@@ -225,34 +227,79 @@ class MidiHandler extends EventEmitter {
     }
 
     startVirtualDevice(device) {
-        // Simulate random MIDI events for testing
-        const notes = [48, 50, 52, 53, 55, 57, 59, 60]; // C major scale
+        console.log('🎹 Virtual MIDI device started');
+        console.log('💡 Use keyboard keys 1-9, Q-O, A-L to simulate MIDI notes');
+        console.log('💡 Use M key to simulate MOD button for profile switching');
         
-        this.virtualTimer = setInterval(() => {
-            const note = notes[Math.floor(Math.random() * notes.length)];
-            const velocity = Math.floor(Math.random() * 64) + 64;
-            
-            // Send note on
-            this.emit('midi-event', {
-                type: 'note',
-                note: note,
-                velocity: velocity,
-                channel: 0,
-                on: true
+        // Set up keyboard simulation for testing
+        this.setupKeyboardSimulation();
+    }
+
+    setupKeyboardSimulation() {
+        // Enable keyboard simulation for testing without real MIDI device
+        if (typeof process !== 'undefined' && process.stdin && process.stdin.setRawMode) {
+            try {
+                process.stdin.setRawMode(true);
+                process.stdin.resume();
+                process.stdin.setEncoding('utf8');
+                
+                process.stdin.on('data', (key) => {
+                // Handle special keys
+                if (key === '\u0003') { // Ctrl+C
+                    process.exit();
+                }
+                
+                // Map keyboard keys to MIDI notes (nanoKEY2 range: 48-72)
+                const keyMap = {
+                    '1': 48, '2': 49, '3': 50, '4': 51, '5': 52,
+                    '6': 53, '7': 54, '8': 55, '9': 56, '0': 57,
+                    'q': 58, 'w': 59, 'e': 60, 'r': 61, 't': 62,
+                    'y': 63, 'u': 64, 'i': 65, 'o': 66, 'p': 67,
+                    'a': 68, 's': 69, 'd': 70, 'f': 71, 'g': 72
+                };
+                
+                const note = keyMap[key.toLowerCase()];
+                if (note) {
+                    // Send note on
+                    this.emit('midi-event', {
+                        type: 'note',
+                        note: note,
+                        velocity: 100,
+                        channel: 0,
+                        on: true
+                    });
+                    
+                    // Send note off after 200ms
+                    setTimeout(() => {
+                        this.emit('midi-event', {
+                            type: 'note',
+                            note: note,
+                            velocity: 0,
+                            channel: 0,
+                            on: false
+                        });
+                    }, 200);
+                    
+                    console.log(`🎵 Virtual note: ${note} (${key})`);
+                }
+                
+                // MOD button simulation
+                if (key.toLowerCase() === 'm') {
+                    this.emit('midi-event', {
+                        type: 'cc',
+                        controller: 1, // MOD button
+                        value: 127,
+                        channel: 0
+                    });
+                    console.log('🎛️ Virtual MOD button pressed');
+                }
             });
-            
-            // Send note off after delay
-            setTimeout(() => {
-                this.emit('midi-event', {
-                    type: 'note',
-                    note: note,
-                    velocity: 0,
-                    channel: 0,
-                    on: false
-                });
-            }, Math.random() * 500 + 100);
-            
-        }, 3000 + Math.random() * 5000);
+            } catch (error) {
+                console.log('⚠️ Keyboard simulation not available in this environment');
+            }
+        } else {
+            console.log('⚠️ Keyboard simulation not supported in this environment');
+        }
     }
 
     stopVirtualDevice() {

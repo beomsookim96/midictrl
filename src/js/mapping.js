@@ -106,6 +106,8 @@ class MappingManager {
         document.getElementById('key-input').value = mapping.key || '';
         document.getElementById('text-input').value = mapping.text || '';
         document.getElementById('command-input').value = mapping.command || '';
+        document.getElementById('application-input').value = mapping.application_path || '';
+        document.getElementById('website-input').value = mapping.website_url || '';
         document.getElementById('velocity-sensitive').checked = mapping.velocity_sensitive || false;
         document.getElementById('velocity-threshold').value = mapping.velocity_threshold || 64;
         document.getElementById('velocity-value').textContent = mapping.velocity_threshold || 64;
@@ -144,10 +146,12 @@ class MappingManager {
         const modifiersGroup = document.getElementById('modifiers-group');
         const textGroup = document.getElementById('text-input-group');
         const commandGroup = document.getElementById('command-input-group');
+        const applicationGroup = document.getElementById('application-input-group');
+        const websiteGroup = document.getElementById('website-input-group');
         const velocityThresholdGroup = document.getElementById('velocity-threshold-group');
         
         // Reset visibility
-        [keyGroup, modifiersGroup, textGroup, commandGroup].forEach(group => {
+        [keyGroup, modifiersGroup, textGroup, commandGroup, applicationGroup, websiteGroup].forEach(group => {
             if (group) group.style.display = 'none';
         });
         
@@ -163,6 +167,12 @@ class MappingManager {
                 break;
             case 'command':
                 commandGroup.style.display = 'block';
+                break;
+            case 'application':
+                applicationGroup.style.display = 'block';
+                break;
+            case 'website':
+                websiteGroup.style.display = 'block';
                 break;
         }
         
@@ -287,6 +297,8 @@ class MappingManager {
             modifiers: modifiers,
             text: document.getElementById('text-input').value,
             command: document.getElementById('command-input').value,
+            application_path: document.getElementById('application-input').value,
+            website_url: document.getElementById('website-input').value,
             velocity_sensitive: document.getElementById('velocity-sensitive').checked,
             velocity_threshold: parseInt(document.getElementById('velocity-threshold').value)
         };

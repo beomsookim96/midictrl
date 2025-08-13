@@ -22,6 +22,10 @@
                     <span class="status-dot"></span>
                     <span class="status-text">No Device</span>
                 </div>
+                <div id="profile-status" class="status-indicator">
+                    <span class="status-dot profile-dot"></span>
+                    <span class="status-text">Profile 1</span>
+                </div>
             </div>
         </header>
 
@@ -107,6 +111,8 @@
                             <option value="key_combo">Key Combination</option>
                             <option value="text_input">Text Input</option>
                             <option value="command">System Command</option>
+                            <option value="application">Launch Application</option>
+                            <option value="website">Open Website</option>
                         </select>
                     </div>
 
@@ -145,6 +151,22 @@
                         <input type="text" id="command-input" placeholder="Enter system command...">
                     </div>
 
+                    <div id="application-input-group" class="form-group" style="display: none;">
+                        <label for="application-input">Application Path:</label>
+                        <input type="text" id="application-input" placeholder="e.g., C:\Program Files\App\app.exe or /usr/bin/app">
+                        <div class="input-help">
+                            <small>Full path to the application executable</small>
+                        </div>
+                    </div>
+
+                    <div id="website-input-group" class="form-group" style="display: none;">
+                        <label for="website-input">Website URL:</label>
+                        <input type="text" id="website-input" placeholder="e.g., https://example.com">
+                        <div class="input-help">
+                            <small>Full URL including http:// or https://</small>
+                        </div>
+                    </div>
+
                     <div class="form-group">
                         <label>
                             <input type="checkbox" id="velocity-sensitive"> Velocity Sensitive
@@ -169,6 +191,6 @@
     <!-- Scripts -->
     <script src="js/piano.js"></script>
     <script src="js/mapping.js"></script>
-    <script src="js/app-new.js"></script>
+    <script src="js/app.js"></script>
 </body>
 </html>

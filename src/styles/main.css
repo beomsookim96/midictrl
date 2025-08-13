@@ -466,3 +466,38 @@ section h3 {
 ::-webkit-scrollbar-thumb:hover {
     background-color: #555555;
 }
+
+/* Profile Status Styling */
+.profile-dot {
+    background-color: #4CAF50 !important;
+    box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
+}
+
+.profile-switched {
+    animation: profileSwitchAnimation 1s ease-in-out;
+}
+
+@keyframes profileSwitchAnimation {
+    0% { 
+        transform: scale(1); 
+        background-color: transparent; 
+    }
+    50% { 
+        transform: scale(1.05); 
+        background-color: rgba(76, 175, 80, 0.2); 
+    }
+    100% { 
+        transform: scale(1); 
+        background-color: transparent; 
+    }
+}
+
+/* Input help text styling */
+.input-help {
+    margin-top: 0.25rem;
+}
+
+.input-help small {
+    color: #888888;
+    font-size: 0.75rem;
+}
