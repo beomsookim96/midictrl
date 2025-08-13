@@ -27,7 +27,8 @@
       "Bash(true)",
       "Bash(mv:*)",
       "Bash(timeout 10s npm run test-midi)",
-      "Bash(timeout 5s npm run test-midi)"
+      "Bash(timeout 5s npm run test-midi)",
+      "Bash(node:*)"
     ],
     "deny": []
   }

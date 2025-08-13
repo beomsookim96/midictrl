@@ -13,6 +13,11 @@ class MidiHandler extends EventEmitter {
         this.devices = [];
         this.keyMapper = keyMapper;
         
+        // MOD button debouncing
+        this.modButtonState = false;
+        this.lastModButtonTime = 0;
+        this.modButtonDebounceTime = 300; // 300ms debounce time
+        
         // Try to load MIDI library
         this.initMidiLibrary();
     }
@@ -103,11 +108,59 @@ class MidiHandler extends EventEmitter {
         console.log(`🔌 Attempting to connect to device: "${device.name}"`);
 
         if (this.libraryType === 'easymidi') {
-            try {
-                console.log('📡 Creating easymidi Input...');
-                this.midiInput = new this.midi.Input(device.name);
-                console.log('✅ easymidi Input created successfully');
-                
+            let retries = 3;
+            let lastError = null;
+            
+            while (retries > 0) {
+                try {
+                    console.log(`📡 Creating easymidi Input... (attempt ${4 - retries}/3)`);
+                    
+                    // Close any existing MIDI input first
+                    if (this.midiInput) {
+                        try {
+                            this.midiInput.close();
+                        } catch (e) {
+                            // Ignore close errors
+                        }
+                        this.midiInput = null;
+                    }
+                    
+                    // Small delay before attempting connection
+                    if (retries < 3) {
+                        const delay = (4 - retries) * 500;
+                        console.log(`⏳ Waiting ${delay}ms before retry...`);
+                        // Use a sync wait that works on all platforms
+                        const waitUntil = Date.now() + delay;
+                        while (Date.now() < waitUntil) {
+                            // Busy wait
+                        }
+                    }
+                    
+                    this.midiInput = new this.midi.Input(device.name);
+                    console.log('✅ easymidi Input created successfully');
+                    break; // Success, exit retry loop
+                    
+                } catch (error) {
+                    lastError = error;
+                    retries--;
+                    console.warn(`⚠️ Connection attempt failed: ${error.message}`);
+                    
+                    if (retries === 0) {
+                        console.error('❌ All connection attempts failed');
+                        console.log('💡 Falling back to virtual mode');
+                        
+                        // Switch to virtual mode as fallback
+                        this.libraryType = 'virtual';
+                        this.setupVirtualMode();
+                        this.startVirtualDevice(device);
+                        this.currentDevice = device;
+                        this.emit('device-connected', device);
+                        return true;
+                    }
+                }
+            }
+            
+            if (this.midiInput) {
                 // Set up event handlers
                 this.midiInput.on('noteon', (msg) => {
                     this.emit('midi-event', {
@@ -130,10 +183,21 @@ class MidiHandler extends EventEmitter {
                 });
 
                 this.midiInput.on('cc', (msg) => {
-                    // Special handling for mod button (controller 1) - profile switching
-                    if (msg.controller === 1 && msg.value > 63 && this.keyMapper) {
-                        const newProfile = this.keyMapper.switchProfile();
-                        this.emit('profile-switched', newProfile);
+                    // Special handling for mod button (controller 1) - profile switching with debouncing
+                    if (msg.controller === 1 && this.keyMapper) {
+                        const currentTime = Date.now();
+                        const isPressed = msg.value > 63;
+                        
+                        // Only switch profile on button press (not release) and with debouncing
+                        if (isPressed && !this.modButtonState) {
+                            if (currentTime - this.lastModButtonTime > this.modButtonDebounceTime) {
+                                const newProfile = this.keyMapper.switchProfile();
+                                this.emit('profile-switched', newProfile);
+                                this.lastModButtonTime = currentTime;
+                            }
+                        }
+                        
+                        this.modButtonState = isPressed;
                     }
                     
                     this.emit('midi-event', {
@@ -143,10 +207,6 @@ class MidiHandler extends EventEmitter {
                         channel: msg.channel
                     });
                 });
-
-            } catch (midiError) {
-                console.error('❌ easymidi connection failed:', midiError.message);
-                throw midiError;
             }
             
         } else if (this.libraryType === 'jazz-midi') {
@@ -212,6 +272,22 @@ class MidiHandler extends EventEmitter {
                 on: false
             });
         } else if (messageType === 0xB0) { // Control Change
+            // Apply same MOD button debouncing for jazz-midi
+            if (note === 1 && this.keyMapper) { // controller 1 is MOD button
+                const currentTime = Date.now();
+                const isPressed = velocity > 63;
+                
+                if (isPressed && !this.modButtonState) {
+                    if (currentTime - this.lastModButtonTime > this.modButtonDebounceTime) {
+                        const newProfile = this.keyMapper.switchProfile();
+                        this.emit('profile-switched', newProfile);
+                        this.lastModButtonTime = currentTime;
+                    }
+                }
+                
+                this.modButtonState = isPressed;
+            }
+            
             this.emit('midi-event', {
                 type: 'cc',
                 controller: note,
@@ -283,15 +359,39 @@ class MidiHandler extends EventEmitter {
                     console.log(`🎵 Virtual note: ${note} (${key})`);
                 }
                 
-                // MOD button simulation
+                // MOD button simulation with debouncing
                 if (key.toLowerCase() === 'm') {
-                    this.emit('midi-event', {
-                        type: 'cc',
-                        controller: 1, // MOD button
-                        value: 127,
-                        channel: 0
-                    });
-                    console.log('🎛️ Virtual MOD button pressed');
+                    const currentTime = Date.now();
+                    
+                    // Apply same debouncing logic as real MIDI
+                    if (currentTime - this.lastModButtonTime > this.modButtonDebounceTime) {
+                        // Simulate button press
+                        this.emit('midi-event', {
+                            type: 'cc',
+                            controller: 1, // MOD button
+                            value: 127,
+                            channel: 0
+                        });
+                        
+                        // Trigger profile switch directly if keyMapper exists
+                        if (this.keyMapper) {
+                            const newProfile = this.keyMapper.switchProfile();
+                            this.emit('profile-switched', newProfile);
+                        }
+                        
+                        this.lastModButtonTime = currentTime;
+                        console.log('🎛️ Virtual MOD button pressed');
+                        
+                        // Simulate button release after 100ms
+                        setTimeout(() => {
+                            this.emit('midi-event', {
+                                type: 'cc',
+                                controller: 1,
+                                value: 0,
+                                channel: 0
+                            });
+                        }, 100);
+                    }
                 }
             });
             } catch (error) {
