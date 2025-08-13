@@ -59,7 +59,11 @@ class MidiCtrlApp {
         // Connect MIDI events to keyboard controller
         this.midiHandler.on('midi-event', async (event) => {
             if (event.type === 'note') {
-                const mapping = this.keyMapper.getMapping(event.note);
+                // Get mapping with current octave
+                const mapping = this.keyMapper.getMappingWithOctave(
+                    event.note, 
+                    this.keyMapper.getCurrentOctave()
+                );
                 
                 if (mapping) {
                     if (event.on) {
@@ -84,6 +88,18 @@ class MidiCtrlApp {
                 if (this.mainWindow && !this.mainWindow.isDestroyed()) {
                     this.mainWindow.webContents.send('midi-event', event);
                 }
+            }
+        });
+        
+        // Handle control button actions (Pitch, Sustain)
+        this.midiHandler.on('control-action', async (event) => {
+            if (event.mapping && event.isPressed) {
+                await this.keyboardController.executeMapping(event.mapping);
+            }
+            
+            // Forward to renderer for UI update
+            if (this.mainWindow && !this.mainWindow.isDestroyed()) {
+                this.mainWindow.webContents.send('control-action', event);
             }
         });
         
@@ -172,10 +188,20 @@ class MidiCtrlApp {
         ipcMain.handle('set-key-mapping', async (event, note, mapping) => {
             return this.keyMapper.setMapping(note, mapping);
         });
+        
+        ipcMain.handle('set-key-mapping-with-octave', async (event, note, octave, mapping) => {
+            return this.keyMapper.setMappingWithOctave(note, octave, mapping);
+        });
+        
+        ipcMain.handle('set-control-mapping', async (event, controlType, mapping) => {
+            return this.keyMapper.setControlMapping(controlType, mapping);
+        });
 
         ipcMain.handle('get-key-mappings', async () => {
             return {
-                mappings: this.keyMapper.getAllMappings()
+                mappings: this.keyMapper.getAllMappings(),
+                controlMappings: this.keyMapper.controlMappings,
+                currentOctave: this.keyMapper.getCurrentOctave()
             };
         });
 
@@ -196,12 +222,49 @@ class MidiCtrlApp {
         });
 
         // Profile operations
-        ipcMain.handle('switch-profile', async () => {
-            return this.keyMapper.switchProfile();
+        ipcMain.handle('switch-profile', async (event, direction) => {
+            return this.keyMapper.switchProfile(direction);
         });
 
         ipcMain.handle('get-current-profile', async () => {
             return this.keyMapper.currentProfile;
+        });
+        
+        ipcMain.handle('get-all-profiles', async () => {
+            return this.keyMapper.getAllProfiles();
+        });
+        
+        ipcMain.handle('create-profile', async (event, name, description) => {
+            return this.keyMapper.createProfile(name, description);
+        });
+        
+        ipcMain.handle('update-profile', async (event, oldName, newName, description) => {
+            return this.keyMapper.updateProfile(oldName, newName, description);
+        });
+        
+        ipcMain.handle('delete-profile', async (event, name) => {
+            return this.keyMapper.deleteProfile(name);
+        });
+        
+        ipcMain.handle('duplicate-profile', async (event, sourceName, newName) => {
+            return this.keyMapper.duplicateProfile(sourceName, newName);
+        });
+        
+        ipcMain.handle('set-profile-cycle-list', async (event, profileNames) => {
+            return this.keyMapper.setProfileCycleList(profileNames);
+        });
+        
+        ipcMain.handle('get-profile-cycle-list', async () => {
+            return this.keyMapper.profileCycleList;
+        });
+        
+        // Octave operations
+        ipcMain.handle('set-octave', async (event, octave) => {
+            return this.keyMapper.setCurrentOctave(octave);
+        });
+        
+        ipcMain.handle('get-octave', async () => {
+            return this.keyMapper.getCurrentOctave();
         });
 
         // File operations

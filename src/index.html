@@ -24,7 +24,11 @@
                 </div>
                 <div id="profile-status" class="status-indicator">
                     <span class="status-dot profile-dot"></span>
-                    <span class="status-text">Profile 1</span>
+                    <span class="status-text">Default</span>
+                </div>
+                <div id="octave-status" class="status-indicator">
+                    <span class="status-dot octave-dot"></span>
+                    <span class="status-text">Oct: 0</span>
                 </div>
             </div>
         </header>
@@ -49,12 +53,10 @@
                 <!-- Control Buttons on the left -->
                 <div class="control-section">
                     <div class="control-grid">
-                        <button class="control-btn" data-control="oct-down">OCT-</button>
-                        <button class="control-btn" data-control="oct-up">OCT+</button>
-                        <button class="control-btn" data-control="pitch-down">PITCH-</button>
-                        <button class="control-btn" data-control="pitch-up">PITCH+</button>
-                        <button class="control-btn" data-control="mod">MOD</button>
-                        <button class="control-btn" data-control="sustain">SUSTAIN</button>
+                        <button class="control-btn mappable" data-control="pitch-down" title="Right-click to configure">PITCH-</button>
+                        <button class="control-btn mappable" data-control="pitch-up" title="Right-click to configure">PITCH+</button>
+                        <button class="control-btn" data-control="mod" title="Profile switcher">MOD</button>
+                        <button class="control-btn mappable" data-control="sustain" title="Right-click to configure">SUSTAIN</button>
                     </div>
                 </div>
                 
@@ -66,6 +68,28 @@
                 </div>
             </section>
 
+            <!-- Profile & Octave Controls -->
+            <section class="profile-section">
+                <div class="profile-header">
+                    <h3>Profile & Octave Control</h3>
+                    <div class="profile-controls">
+                        <select id="profile-select">
+                            <option value="">Select Profile...</option>
+                        </select>
+                        <button id="profile-prev-btn" class="btn">⬅</button>
+                        <button id="profile-next-btn" class="btn">➡</button>
+                        <button id="manage-profiles-btn" class="btn btn-primary">Manage</button>
+                    </div>
+                    <div class="octave-controls">
+                        <label>Octave:</label>
+                        <button id="octave-down-btn" class="btn">-</button>
+                        <input type="range" id="octave-slider" min="-3" max="3" value="0" step="1">
+                        <button id="octave-up-btn" class="btn">+</button>
+                        <span id="octave-display">0</span>
+                    </div>
+                </div>
+            </section>
+
             <!-- Mapping Panel -->
             <section class="mapping-panel">
                 <div class="mapping-header">
@@ -73,12 +97,6 @@
                     <div class="preset-controls">
                         <select id="preset-select">
                             <option value="">Select Preset...</option>
-                            <option value="daw_shortcuts">DAW Shortcuts</option>
-                            <option value="gaming_controls">Gaming Controls</option>
-                            <option value="text_shortcuts">Text Shortcuts</option>
-                            <option value="function_keys">Function Keys</option>
-                            <option value="chromatic_numbers">Chromatic Numbers</option>
-                            <option value="chromatic_letters">Chromatic Letters</option>
                         </select>
                         <button id="load-preset-btn" class="btn">Load</button>
                         <button id="save-preset-btn" class="btn">Save</button>
@@ -102,6 +120,7 @@
                     <div class="form-group">
                         <label>Note:</label>
                         <span id="modal-note-info" class="note-info"></span>
+                        <span id="modal-octave-info" class="octave-info"></span>
                     </div>
                     
                     <div class="form-group">
@@ -183,6 +202,113 @@
                     <button id="save-mapping-btn" class="btn btn-primary">Save Mapping</button>
                     <button id="delete-mapping-btn" class="btn btn-danger">Delete Mapping</button>
                     <button id="cancel-mapping-btn" class="btn">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Management Modal -->
+        <div id="profile-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4>Profile Management</h4>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="profile-actions">
+                        <button id="create-profile-btn" class="btn btn-primary">Create New</button>
+                        <button id="duplicate-profile-btn" class="btn">Duplicate</button>
+                        <button id="rename-profile-btn" class="btn">Rename</button>
+                        <button id="delete-profile-btn" class="btn btn-danger">Delete</button>
+                        <button id="import-profile-btn" class="btn">Import</button>
+                        <button id="export-all-profiles-btn" class="btn">Export All</button>
+                    </div>
+                    
+                    <div class="profile-list-section">
+                        <h5>All Profiles</h5>
+                        <div id="profile-list" class="profile-list">
+                            <!-- Profile items will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <div class="cycle-config-section">
+                        <h5>Profile Cycle Configuration</h5>
+                        <div class="cycle-help">
+                            <small>Select which profiles to cycle through with the MOD button:</small>
+                        </div>
+                        <div id="cycle-list" class="cycle-list">
+                            <!-- Cycle items will be populated by JavaScript -->
+                        </div>
+                        <button id="save-cycle-config-btn" class="btn">Save Cycle Configuration</button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="close-profile-modal-btn" class="btn">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Control Mapping Modal -->
+        <div id="control-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4>Control Button Mapping</h4>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Control Button:</label>
+                        <span id="control-modal-name" class="control-name"></span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="control-mapping-type">Mapping Type:</label>
+                        <select id="control-mapping-type">
+                            <option value="single_key">Single Key</option>
+                            <option value="key_combo">Key Combination</option>
+                            <option value="text_input">Text Input</option>
+                            <option value="command">System Command</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="control-trigger-mode">Trigger Mode:</label>
+                        <select id="control-trigger-mode">
+                            <option value="press">Press</option>
+                            <option value="release">Release</option>
+                            <option value="toggle">Toggle</option>
+                            <option value="hold">Hold</option>
+                        </select>
+                    </div>
+
+                    <div id="control-key-input-group" class="form-group">
+                        <label for="control-key-input">Key:</label>
+                        <input type="text" id="control-key-input" placeholder="Click and press a key...">
+                    </div>
+
+                    <div id="control-modifiers-group" class="form-group">
+                        <label>Modifiers:</label>
+                        <div class="checkbox-group">
+                            <label><input type="checkbox" id="control-ctrl-mod"> Ctrl</label>
+                            <label><input type="checkbox" id="control-shift-mod"> Shift</label>
+                            <label><input type="checkbox" id="control-alt-mod"> Alt</label>
+                            <label><input type="checkbox" id="control-meta-mod"> Meta/Win</label>
+                        </div>
+                    </div>
+
+                    <div id="control-text-input-group" class="form-group" style="display: none;">
+                        <label for="control-text-input">Text to Type:</label>
+                        <textarea id="control-text-input" placeholder="Enter text to type..."></textarea>
+                    </div>
+
+                    <div id="control-command-input-group" class="form-group" style="display: none;">
+                        <label for="control-command-input">Command:</label>
+                        <input type="text" id="control-command-input" placeholder="Enter system command...">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="save-control-mapping-btn" class="btn btn-primary">Save Mapping</button>
+                    <button id="delete-control-mapping-btn" class="btn btn-danger">Delete Mapping</button>
+                    <button id="cancel-control-mapping-btn" class="btn">Cancel</button>
                 </div>
             </div>
         </div>

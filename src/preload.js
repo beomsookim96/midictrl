@@ -10,17 +10,30 @@ contextBridge.exposeInMainWorld('electronAPI', {
     
     // Key mapping operations
     setKeyMapping: (note, mapping) => ipcRenderer.invoke('set-key-mapping', note, mapping),
+    setKeyMappingWithOctave: (note, octave, mapping) => ipcRenderer.invoke('set-key-mapping-with-octave', note, octave, mapping),
+    setControlMapping: (controlType, mapping) => ipcRenderer.invoke('set-control-mapping', controlType, mapping),
     getKeyMappings: () => ipcRenderer.invoke('get-key-mappings'),
     
     // Preset operations
     loadPreset: (presetName) => ipcRenderer.invoke('load-preset', presetName),
-    savePreset: (presetName) => ipcRenderer.invoke('save-preset', presetName),
+    savePreset: (presetName, description) => ipcRenderer.invoke('save-preset', presetName, description),
     getPresets: () => ipcRenderer.invoke('get-presets'),
     clearAllMappings: () => ipcRenderer.invoke('clear-all-mappings'),
     
-    // Profile operations
-    switchProfile: () => ipcRenderer.invoke('switch-profile'),
+    // Enhanced Profile operations
+    switchProfile: (direction) => ipcRenderer.invoke('switch-profile', direction),
     getCurrentProfile: () => ipcRenderer.invoke('get-current-profile'),
+    getAllProfiles: () => ipcRenderer.invoke('get-all-profiles'),
+    createProfile: (name, description) => ipcRenderer.invoke('create-profile', name, description),
+    updateProfile: (oldName, newName, description) => ipcRenderer.invoke('update-profile', oldName, newName, description),
+    deleteProfile: (name) => ipcRenderer.invoke('delete-profile', name),
+    duplicateProfile: (sourceName, newName) => ipcRenderer.invoke('duplicate-profile', sourceName, newName),
+    setProfileCycleList: (profileNames) => ipcRenderer.invoke('set-profile-cycle-list', profileNames),
+    getProfileCycleList: () => ipcRenderer.invoke('get-profile-cycle-list'),
+    
+    // Octave operations
+    setOctave: (octave) => ipcRenderer.invoke('set-octave', octave),
+    getOctave: () => ipcRenderer.invoke('get-octave'),
     
     getAppInfo: () => ipcRenderer.invoke('get-app-info'),
     
@@ -35,6 +48,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     onDeviceConnected: (callback) => ipcRenderer.on('device-connected', (event, data) => callback(data)),
     onDeviceDisconnected: (callback) => ipcRenderer.on('device-disconnected', (event, data) => callback(data)),
     onProfileSwitched: (callback) => ipcRenderer.on('profile-switched', (event, data) => callback(data)),
+    onControlAction: (callback) => ipcRenderer.on('control-action', (event, data) => callback(data)),
     
     // Remove listeners
     removeAllListeners: (channel) => ipcRenderer.removeAllListeners(channel)

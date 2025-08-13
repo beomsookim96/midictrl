@@ -501,3 +501,227 @@ section h3 {
     color: #888888;
     font-size: 0.75rem;
 }
+
+/* Enhanced Profile & Octave Styles */
+.octave-dot {
+    background-color: #ff9800;
+}
+
+.octave-dot.active {
+    background-color: #ff5722;
+}
+
+.profile-section {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d1b69 100%);
+    border: 1px solid #4A90E2;
+}
+
+.profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.profile-controls {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.octave-controls {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+#octave-slider {
+    width: 120px;
+    accent-color: #ff9800;
+}
+
+#octave-display {
+    background-color: #ff9800;
+    color: #000;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-weight: bold;
+    min-width: 30px;
+    text-align: center;
+}
+
+.control-btn.mappable {
+    position: relative;
+}
+
+.control-btn.mappable::after {
+    content: "⚙";
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #4A90E2;
+    color: white;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.control-btn.has-mapping {
+    border: 2px solid #4CAF50;
+    box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+}
+
+/* Profile Management Modal Styles */
+.profile-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.profile-list {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #333;
+    border-radius: 6px;
+    background-color: #0d1117;
+}
+
+.profile-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    border-bottom: 1px solid #333;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.profile-item:hover {
+    background-color: #1a1a1a;
+}
+
+.profile-item.current {
+    background-color: #2d1b69;
+    border-left: 4px solid #4A90E2;
+}
+
+.profile-info {
+    flex: 1;
+}
+
+.profile-name {
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.profile-description {
+    font-size: 0.8rem;
+    color: #aaa;
+}
+
+.profile-stats {
+    font-size: 0.8rem;
+    color: #888;
+}
+
+.cycle-list {
+    margin: 1rem 0;
+    border: 1px solid #333;
+    border-radius: 6px;
+    background-color: #0d1117;
+}
+
+.cycle-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border-bottom: 1px solid #333;
+}
+
+.cycle-item:last-child {
+    border-bottom: none;
+}
+
+.cycle-checkbox {
+    margin: 0;
+    width: auto;
+}
+
+.cycle-order {
+    background-color: #4A90E2;
+    color: white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.octave-info {
+    background-color: #ff9800;
+    color: #000;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    margin-left: 0.5rem;
+}
+
+/* Enhanced Mapping List */
+.mapping-item.octave-mapped {
+    border-left: 4px solid #ff9800;
+}
+
+.octave-indicator {
+    background-color: #ff9800;
+    color: #000;
+    padding: 0.2rem 0.4rem;
+    border-radius: 8px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    margin-left: 0.5rem;
+}
+
+/* Control Mapping Indicators */
+.control-mapping-indicator {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 50%;
+    width: 12px;
+    height: 12px;
+    font-size: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Responsive enhancements */
+@media (max-width: 768px) {
+    .profile-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .profile-controls,
+    .octave-controls {
+        justify-content: center;
+    }
+    
+    .profile-actions {
+        justify-content: center;
+    }
+}

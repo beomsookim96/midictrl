@@ -183,21 +183,59 @@ class MidiHandler extends EventEmitter {
                 });
 
                 this.midiInput.on('cc', (msg) => {
-                    // Special handling for mod button (controller 1) - profile switching with debouncing
-                    if (msg.controller === 1 && this.keyMapper) {
+                    // Special handling for control buttons
+                    if (this.keyMapper) {
                         const currentTime = Date.now();
                         const isPressed = msg.value > 63;
                         
-                        // Only switch profile on button press (not release) and with debouncing
-                        if (isPressed && !this.modButtonState) {
-                            if (currentTime - this.lastModButtonTime > this.modButtonDebounceTime) {
-                                const newProfile = this.keyMapper.switchProfile();
-                                this.emit('profile-switched', newProfile);
-                                this.lastModButtonTime = currentTime;
+                        // MOD button (controller 1) - profile switching with debouncing
+                        if (msg.controller === 1) {
+                            // Only switch profile on button press (not release) and with debouncing
+                            if (isPressed && !this.modButtonState) {
+                                if (currentTime - this.lastModButtonTime > this.modButtonDebounceTime) {
+                                    const newProfile = this.keyMapper.switchProfile();
+                                    this.emit('profile-switched', newProfile);
+                                    this.lastModButtonTime = currentTime;
+                                }
+                            }
+                            this.modButtonState = isPressed;
+                        }
+                        
+                        // Pitch Up button (controller 82)
+                        else if (msg.controller === 82) {
+                            const mapping = this.keyMapper.getControlMapping('pitch_up');
+                            if (mapping) {
+                                this.emit('control-action', {
+                                    control: 'pitch_up',
+                                    mapping: mapping,
+                                    isPressed: isPressed
+                                });
                             }
                         }
                         
-                        this.modButtonState = isPressed;
+                        // Pitch Down button (controller 81)
+                        else if (msg.controller === 81) {
+                            const mapping = this.keyMapper.getControlMapping('pitch_down');
+                            if (mapping) {
+                                this.emit('control-action', {
+                                    control: 'pitch_down',
+                                    mapping: mapping,
+                                    isPressed: isPressed
+                                });
+                            }
+                        }
+                        
+                        // Sustain button (controller 64)
+                        else if (msg.controller === 64) {
+                            const mapping = this.keyMapper.getControlMapping('sustain');
+                            if (mapping) {
+                                this.emit('control-action', {
+                                    control: 'sustain',
+                                    mapping: mapping,
+                                    isPressed: isPressed
+                                });
+                            }
+                        }
                     }
                     
                     this.emit('midi-event', {
