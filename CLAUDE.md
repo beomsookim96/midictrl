@@ -9,29 +9,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 # Install Node.js dependencies
 npm install
 
-# One-command setup (installs everything and starts app)
-npm run setup
+# Rebuild native modules for current platform
+npm rebuild
 
 # Test MIDI functionality
 npm run test-midi
 
 # Test keyboard control (robotjs)
 npm run test-robotjs
-
-# Windows-specific helpers
-node install-windows.js             # Install Windows dependencies
-install_windows.bat                  # Batch script installer
-fix_robotjs.bat                      # Fix robotjs compilation issues
 ```
 
 ### Running the Application
 ```bash
 npm start                           # Production mode
 npm run dev                         # Development mode (with DevTools)
-
-# Alternative Electron commands
 electron .                          # Direct Electron execution
-electron . --dev                    # Dev mode
 ```
 
 ### Building & Distribution
@@ -39,90 +31,87 @@ electron . --dev                    # Dev mode
 npm run build                       # Build for all platforms
 npm run pack                        # Package without distribution
 npm run dist                        # Create distributable packages
-
-# Platform-specific builds
-npm run dist -- --win              # Windows only
-npm run dist -- --mac              # macOS only
-npm run dist -- --linux            # Linux only
+npm run dist -- --win              # Windows only build
 ```
 
-### Development & Testing
+### Diagnostic & Testing
 ```bash
-# Backend testing
-node test-backend.js                # Test Node.js backend
-node restart-backend.js             # Restart backend components
-node kill-backend.js                # Kill background processes
-
-# MIDI testing
 node test-midi.js                   # Test MIDI device detection
-node test_robotjs.js                # Test keyboard control
+node diagnose-midi.js               # Comprehensive MIDI diagnostics
 ```
 
 ## Architecture Overview
 
-### Core Components
-
 **MidiCtrl** is an Electron-based MIDI key mapper for KORG nanoKEY2 controllers with a hybrid architecture:
 
-1. **Frontend Layer** (`src/`):
-   - `main.js`: Main Electron process with IPC handlers
-   - `preload.js`: Secure IPC bridge between main and renderer
-   - `index.html`: Web-based UI
-   - `js/`: Frontend JavaScript modules (app.js, piano.js, mapping.js)
+### Core Components
 
-2. **Backend Layer** (Node.js modules in `src/`):
-   - `core/keyMapper.js`: Configuration management with profile system
-   - `core/keyboardController.js`: Cross-platform keyboard automation (robotjs/nut.js)
-   - `core/notificationSystem.js`: Desktop notifications for profile switching
-   - `midi/midiHandler.js`: MIDI device handling with easymidi
+1. **Electron Main Process** (`src/main.js`):
+   - Manages application lifecycle
+   - Handles IPC communication with renderer
+   - Initializes backend services (MIDI, keyboard control)
+   - Profile management and switching
 
+2. **MIDI Handler** (`src/midi/midiHandler.js`):
+   - Device detection and connection with retry logic
+   - Event processing with MOD button debouncing (300ms)
+   - Falls back to virtual mode when hardware unavailable
+   - Supports easymidi, jazz-midi, and virtual testing modes
 
-### Key Architecture Patterns
+3. **Key Mapper** (`src/core/keyMapper.js`):
+   - Dual-profile system (Profile 1/2) with MOD button switching
+   - Configuration persistence at `~/.midictrl/config.json`
+   - Preset management with default presets
+   - Note-to-action mapping resolution
 
-- **Electron Main/Renderer**: Secure IPC communication between processes
-- **Event-Driven**: EventEmitter-based architecture for MIDI and keyboard events
-- **Profile System**: Dual-profile support with MOD button switching (Profile 1 ↔ Profile 2)
-- **Cross-Platform Keyboard Control**: robotjs (primary) with nut.js fallback
-- **Virtual Mode**: Graceful degradation when native libraries fail
-- **Desktop Notifications**: Native OS notifications for profile changes
+4. **Keyboard Controller** (`src/core/keyboardController.js`):
+   - Cross-platform keyboard automation
+   - robotjs primary, nut.js fallback, virtual mode as last resort
+   - Text input optimization via clipboard
+   - Command and application launching support
 
-### MIDI Event Flow
-1. `easymidi` detects MIDI events from nanoKEY2
-2. `MidiHandler` processes and emits structured events
-3. MOD button (control 1) triggers profile switching
-4. `KeyMapper` resolves note → mapping based on current profile
-5. `KeyboardController` executes the mapped action
-6. Desktop notification shows profile changes
+### Event Flow & Profile System
 
-### Mapping Types & Features
-- **Enhanced Mapping Types**:
-  - `single_key` / `key_combo`: Standard key presses with modifiers
-  - `text_input`: Fast text input via clipboard (Ctrl+V) with fallback
-  - `command`: System command execution
-  - `application`: Cross-platform application launching
-  - `website`: URL opening via Electron shell
-  - `macro`: Multi-step automation (planned)
+1. MIDI input → `MidiHandler` processes events
+2. MOD button (CC#1) triggers debounced profile switch
+3. `KeyMapper` saves current profile, loads new profile mappings
+4. Desktop notification confirms profile change
+5. Note events resolve to actions based on active profile
 
-- **Profile Management**:
-  - Two profiles: "Profile 1" and "Profile 2"
-  - MOD button switches profiles with desktop notification
-  - Independent mapping configurations per profile
-  - Automatic save/restore of profile state
+### MIDI Connection Handling
 
-### Configuration Storage
-- Main config: `~/.midictrl/config.json`
-- Profile data embedded in config with current profile tracking
-- Preset system: `~/.midictrl/presets/`
-- Settings persist automatically with profile-aware storage
+The system implements robust connection handling:
+- 3 retry attempts with increasing delays (500ms, 1000ms)
+- Automatic fallback to virtual mode on failure
+- Proper cleanup of existing connections before retry
+- Platform-specific error handling (Windows MIDI port conflicts)
 
-### Error Handling & Fallbacks
-- **MIDI Libraries**: easymidi → virtual mode (with fake device simulation)
-- **Keyboard Control**: robotjs → nut.js → virtual logging mode
-- **Text Input**: clipboard method → character-by-character fallback
-- **Profile System**: Graceful handling of missing profile data
+### Platform-Specific Considerations
 
-### Cross-Platform Considerations
-- **Windows**: Uses `start` command for applications, handles robotjs compilation
-- **macOS**: Uses `open` command, supports .app bundles
-- **Linux**: Uses `xdg-open`, requires audio group membership for MIDI
-- **WSL2**: Special handling for Windows subsystem limitations
+**Windows**:
+- Must run from PowerShell/CMD, not WSL2
+- MIDI devices inaccessible from WSL2
+- May need to rebuild native modules: `npm rebuild`
+- Check for DAWs or browsers using MIDI ports
+
+**WSL2 Limitations**:
+- Cannot access Windows MIDI devices
+- Automatically falls back to virtual mode
+- Use Windows batch files for proper execution
+
+### Error Recovery Strategies
+
+1. **MIDI Connection Failures**:
+   - Retry with delays
+   - Check for port conflicts
+   - Fall back to virtual mode
+
+2. **Native Module Issues**:
+   - Detect platform mismatches (ELF header errors)
+   - Provide platform-specific rebuild instructions
+   - Virtual mode as ultimate fallback
+
+3. **Profile Switching**:
+   - Debouncing prevents rapid switching
+   - State preserved between switches
+   - Graceful handling of corrupted config
